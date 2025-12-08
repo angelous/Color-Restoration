@@ -1,5 +1,5 @@
-torch==2.6.0+cpu
-torchvision==0.21.0+cpu
+torch==2.5.1+cpu
+torchvision==0.20.1+cpu
 
 streamlit==1.51.0
 scikit-image
