@@ -1,6 +1,6 @@
 torch==2.5.1
 torchvision==0.20.1
-
+matplotlib
 streamlit==1.51.0
 scikit-image
 opencv-python
