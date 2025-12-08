@@ -1,3 +1,4 @@
+import gc
 import streamlit as st
 import torch
 import torch.nn as nn
@@ -13,7 +14,7 @@ st.set_page_config(layout="wide", page_title="Image Colorization App")
 
 st.write("## Image Colorization")
 st.write(
-    "Lorem Ipsum is simply dummy text of the printing and typesetting industry."
+    "Restore color to black and white images"
 )
 st.sidebar.write("## Upload and download")
 
@@ -65,13 +66,16 @@ class ColorizationNet(nn.Module):
 
         return out
 
-device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-model = ColorizationNet().to(device)
+@st.cache_resource
+def load_model():
+    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+    model = ColorizationNet().to(device)
+    model_path = 'model_colorization_tuned (2).pth'
+    model.load_state_dict(torch.load(model_path, map_location=device))
+    model.eval()
+    return model, device
 
-model_path = 'model_colorization_tuned (2).pth'
-
-model.load_state_dict(torch.load(model_path, map_location=device))
-model.eval()
+model, device = load_model()
 
 def colorize_image(image_path):
     # 1. Buka Gambar & Preprocessing
@@ -110,6 +114,9 @@ def colorize_image(image_path):
     result_rgb_uint8 = (np.clip(result_rgb, 0, 1) * 255).astype("uint8")
     result_img_pil = Image.fromarray(result_rgb_uint8)
     result_img_original_size = result_img_pil.resize(original_size, Image.BICUBIC)
+
+    del input_l, pred_ab, result_lab, result_rgb, img_lab
+    gc.collect()
 
     return np.array(result_img_original_size) / 255.0
 
@@ -156,7 +163,12 @@ if image_input is not None:
     )
 
     # Hapus file sementara
-    os.remove("temp_image.png")
+    if os.path.exists("temp_image.png"):
+        os.remove("temp_image.png")
+        
+    # Final Garbage Collection
+    gc.collect()
+    
 else:
     default_image_path = "./image5006.jpg"
     colorized_img = colorize_image(default_image_path)
