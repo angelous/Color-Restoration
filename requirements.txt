@@ -1,7 +1,9 @@
-matplotlib==3.7.1
-numpy==2.3.5
-Pillow==12.0.0
-scikit-image
+torch==2.2.0+cpu
+torchvision==0.17.0+cpu
+--extra-index-url https://download.pytorch.org/whl/cpu
+
 streamlit==1.51.0
-torch==2.5.1+cu121
-torchvision==0.20.1+cu121
+scikit-image
+opencv-python
+numpy
+Pillow
