@@ -85,7 +85,7 @@ def colorize_image(image_path):
     original_size = img.size
 
     # Resize ke 256x256 (karena model dilatih di ukuran ini)
-    transform = transforms.Resize((192, 192))
+    transform = transforms.Resize((256, 256))
     img_resized = transform(img)
 
     # Konversi ke LAB dan Ambil L
