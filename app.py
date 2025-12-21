@@ -133,8 +133,17 @@ def convert_image_np_to_png(np_img):
 col1, col2 = st.columns(2)
 image_input = st.sidebar.file_uploader("Upload an image", type=["png", "jpg", "jpeg"])
 
+MAX_SIZE_KB = 400
+
+if image_input is not None:
+    size_kb = len(image_input.getbuffer()) / 1024
+    if size_kb > MAX_SIZE_KB:
+        st.error(f"File is too big! Maximum {MAX_SIZE_KB} KB.")
+        image_input = None
+
 with st.sidebar.expander("ℹ️ Image Guidelines"):
     st.write("""
+    - Images should be less than 400 KB
     - Large images will be automatically resized
     - Supported formats: PNG, JPG, JPEG
     """)
