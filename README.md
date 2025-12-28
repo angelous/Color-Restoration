@@ -2,6 +2,12 @@
 Projek ini berfokus pada restorasi pada citra grayscale secara otomatis menggunakan Deep Learning. 
 Model yang digunakan berbasis arsitektur **U-Net** dengan **ResNet18 pretrained** sebagai encoder, yang di-fine-tune untuk memprediksi informasi warna pada ruang warna LAB.
 
+## Project Structure
+- app.py                           : Streamlit deployment (Render)
+- computer_vision_script.ipynb     : Training & evaluation
+- model_colorization_tuned (2).pth : Trained ResNet18 U-Net model
+- requirements.txt                 : Dependencies
+
 ## Deployment
 Model dideploy menggunakan **Streamlit**. Aplikasi ini memungkinkan pengguna untuk melakukan restorasi warna pada citra grayscale melalui web tanpa melakukan proses training ulang.
 
