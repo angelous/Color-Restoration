@@ -70,7 +70,7 @@ class ColorizationNet(nn.Module):
 def load_model():
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     model = ColorizationNet().to(device)
-    model_path = 'model_colorization_tuned (2).pth'
+    model_path = './Model/model_colorization_tuned (2).pth'
     model.load_state_dict(torch.load(model_path, map_location=device))
     model.eval()
     return model, device
@@ -78,13 +78,13 @@ def load_model():
 model, device = load_model()
 
 def colorize_image(image_path):
-    # 1. Buka Gambar & Preprocessing
+    # Buka Gambar & Preprocessing
     img = Image.open(image_path).convert("RGB")
 
-    # Simpan ukuran asli untuk resize balik nanti (opsional, biar rapi)
+    # Simpan ukuran asli untuk resize balik nanti
     original_size = img.size
 
-    # Resize ke 256x256 (karena model dilatih di ukuran ini)
+    # Resize ke 256x256
     transform = transforms.Resize((256, 256))
     img_resized = transform(img)
 
@@ -95,20 +95,20 @@ def colorize_image(image_path):
     # Siapkan Tensor
     input_l = torch.from_numpy(img_l).unsqueeze(0).unsqueeze(0).float().to(device)
 
-    # 2. Prediksi (Inference)
+    # Inference
     with torch.no_grad():
         pred_ab = model(input_l)
 
-    # 3. Post-processing (Gabung L + ab prediksi)
+    # Post-processing (Gabung L + ab prediksi)
     SATURATION = 1.5
     pred_ab = pred_ab.squeeze().cpu().numpy().transpose((1, 2, 0)) * 128.0 * SATURATION
 
-    # Gabung L asli (yang diresize) dengan ab hasil prediksi
+    # Gabung L asli dengan ab hasil prediksi
     result_lab = np.zeros((256, 256, 3))
     result_lab[:, :, 0] = img_lab[:, :, 0]
     result_lab[:, :, 1:] = pred_ab
 
-    # Convert balik ke RGB
+    # Convert ke RGB
     result_rgb = lab2rgb(result_lab)
 
     result_rgb_uint8 = (np.clip(result_rgb, 0, 1) * 255).astype("uint8")
@@ -121,7 +121,6 @@ def colorize_image(image_path):
     return np.array(result_img_original_size) / 255.0
 
 def convert_image_np_to_png(np_img):
-    # np_img bentuknya float 0–1 → convert ke uint8
     np_img_uint8 = (np.clip(np_img, 0, 1) * 255).astype("uint8")
     img_pil = Image.fromarray(np_img_uint8)
 
@@ -149,11 +148,9 @@ with st.sidebar.expander("ℹ️ Image Guidelines"):
     """)
 
 if image_input is not None:
-    # Simpan gambar yang diupload ke disk sementara
     with open("temp_image.png", "wb") as f:
         f.write(image_input.getbuffer())
 
-    # Warna gambar
     colorized_img = colorize_image("temp_image.png")
 
     # Tampilkan hasil
@@ -171,15 +168,13 @@ if image_input is not None:
         "image/png"
     )
 
-    # Hapus file sementara
     if os.path.exists("temp_image.png"):
         os.remove("temp_image.png")
         
-    # Final Garbage Collection
     gc.collect()
 
 else:
-    default_image_path = "./image5006.jpg"
+    default_image_path = "./Assets/image5006.jpg"
     colorized_img = colorize_image(default_image_path)
 
     with col1:
